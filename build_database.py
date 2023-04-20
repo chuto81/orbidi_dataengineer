@@ -85,35 +85,59 @@ class BuildPostgreSQLDatabase():
         self.connection.commit()
         cursor.close()
 
+    def insert_data(self):
+        cursor = self.connection.cursor()
 
-    # def insert_data(self):
-    #     cursor = self.connection.cursor()
-
-    #     for cliente in clientes:
-    #         cursor.execute('''INSERT INTO clientes (id, custom_id, name, text_content, description) VALUES (%s, %s, %s, %s, %s) ON CONFLICT DO NOTHING''', 
-    #             (cliente['id'], cliente['custom_id'], cliente['name'], cliente['text_content'], cliente['description']))
-
-    #     for producto in proyectos:
-    #         cursor.execute('''INSERT INTO proyectos (id, custom_id, name, text_content, description) VALUES (%s, %s, %s, %s, %s) ON CONFLICT DO NOTHING''', 
-    #             (producto['id'], producto['custom_id'], producto['name'], producto['text_content'], producto['description']))
-
-    #     for cliente in clientes:
-    #         for link in cliente['linked_tasks']:
-    #             cursor.execute('''INSERT INTO cliente_producto (task_id, link_id) VALUES (%s, %s) ON CONFLICT DO NOTHING''', 
-    #                 (link['task_id'], link['link_id']))
-
-    #     self.connection.commit()
-    #     cursor.close()
-
-    # def main():
-    #     # self.connection = psycopg2.connect(user="your_user",
-    #     #                             password="your_password",
-    #     #                             host="127.0.0.1",
-    #     #                             port="5432",
-    #     #                             database="your_database")
+        for cliente in self.clientes:
+            cursor.execute("""
+            INSERT INTO clientes (external_id, custom_id, name, text_content, 
+            description, status_status, status_color, status_type, status_orderindex, 
+            orderindex, date_created, date_updated, time_estimate, team_id, space_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (external_id) DO NOTHING
+            """, (cliente['id'], cliente['custom_id'], cliente['name'], cliente['text_content'], 
+                  cliente['description'], cliente['status']['status'], cliente['status']['color'], 
+                  cliente['status']['type'], cliente['status']['orderindex'], cliente['orderindex'], 
+                  cliente['date_created'], cliente['date_updated'], cliente['time_estimate'], 
+                  cliente['team_id'], cliente['space']['id']))
+            self.connection.commit()
 
 
-    #     self.connection.close()
+        for proyecto in self.proyectos:
+            cursor.execute("""
+            INSERT INTO proyectos (external_id, custom_id, name, text_content, description, 
+            status_status, status_color, status_type, status_orderindex, orderindex, 
+            date_created, date_updated, time_estimate, team_id, space_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (external_id) DO NOTHING
+            """, (proyecto['id'], proyecto['custom_id'], proyecto['name'], proyecto['text_content'], 
+                  proyecto['description'], proyecto['status']['status'], proyecto['status']['color'], 
+                  proyecto['status']['type'], proyecto['status']['orderindex'], proyecto['orderindex'], 
+                  proyecto['date_created'], proyecto['date_updated'], proyecto['time_estimate'], 
+                  proyecto['team_id'], proyecto['space']['id']))
+            self.connection.commit()
 
-# if __name__ == "__main__":
-#     main()
+        # Inserting the relationships cliente_proyecto on that table
+        for cliente in self.clientes:
+            for linked_task in cliente['linked_tasks']:
+                # Obteinig internal client ID and its project
+                cursor.execute("SELECT id FROM clientes WHERE external_id = %s", 
+                               (linked_task['task_id'],))
+                cliente_id = cursor.fetchone()[0]
+                cursor.execute("SELECT id FROM proyectos WHERE external_id = %s", 
+                               (linked_task['link_id'],))
+                proyecto_id = cursor.fetchone()[0]
+
+                # Inserting the relationshio on cliente_proyecto table
+                cursor.execute("""
+                INSERT INTO cliente_proyecto (cliente_id, proyecto_id, date_created, userid, 
+                workspace_id)
+                VALUES (%s, %s, %s, %s, %s)
+                ON CONFLICT DO NOTHING
+                """, (cliente_id, proyecto_id, linked_task['date_created'], linked_task['userid'], 
+                      linked_task['workspace_id']))
+                self.connection.commit()
+
+        # Closgin cursor and connection
+        cursor.close()
+        self.connection.close()
