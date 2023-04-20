@@ -1,4 +1,23 @@
-# orbidi_dataengineer
-Orbidi test
+# Orbidi Test
 
-'{\n    "id": "str",\n    "custom_id": "NoneType",\n    "name": "str",\n    "text_content": "str",\n    "description": "str",\n    "status": {\n        "status": "str",\n        "color": "str",\n        "type": "str",\n        "orderindex": "int"\n    },\n    "orderindex": "str",\n    "date_created": "str",\n    "date_updated": "str",\n    "date_closed": "NoneType",\n    "date_done": "NoneType",\n    "archived": "bool",\n    "creator": {\n        "id": "int",\n        "username": "str",\n        "color": "str",\n        "email": "str",\n        "profilePicture": "str"\n    },\n    "assignees": "list",\n    "watchers": "list",\n    "checklists": [\n        {\n            "id": "str",\n            "task_id": "str",\n            "name": "str",\n            "date_created": "str",\n            "orderindex": "int",\n            "creator": "int",\n            "resolved": "int",\n            "unresolved": "int",\n            "items": [\n                {\n                    "id": "str",\n                    "name": "str",\n                    "orderindex": "int",\n                    "assignee": "NoneType",\n                    "group_assignee": "NoneType",\n                    "resolved": "bool",\n                    "parent": "NoneType",\n                    "date_created": "str",\n                    "children": "list"\n                }\n            ]\n        }\n    ],\n    "tags": "list",\n    "parent": "NoneType",\n    "priority": "NoneType",\n    "due_date": "NoneType",\n    "start_date": "NoneType",\n    "points": "NoneType",\n    "time_estimate": "int",\n    "custom_fields": "list",\n    "dependencies": "list",\n    "linked_tasks": [\n        {\n            "task_id": "str",\n            "link_id": "str",\n            "date_created": "str",\n            "userid": "str",\n            "workspace_id": "str"\n        }\n    ],\n    "team_id": "str",\n    "url": "str",\n    "sharing": {\n        "public": "bool",\n        "public_share_expires_on": "NoneType",\n        "public_fields": "list",\n        "token": "NoneType",\n        "seo_optimized": "bool"\n    },\n    "permission_level": "str",\n    "list": {\n        "id": "str",\n        "name": "str",\n        "access": "bool"\n    },\n    "project": {\n        "id": "str",\n        "name": "str",\n        "hidden": "bool",\n        "access": "bool"\n    },\n    "folder": {\n        "id": "str",\n        "name": "str",\n        "hidden": "bool",\n        "access": "bool"\n    },\n    "space": {\n        "id": "str"\n    }\n}'
+## Before run
+
+Create Python enviroment using venv.
+
+Write in your terminal
+
+`python -m venv /path/to/new/virtual/{name_environment}`
+
+## Install libraries
+
+Write in your terminal
+
+`pip install -r requirements.txt`
+
+## Run main.py
+
+Finally run main.py to find the solution of all questions
+
+Write in your terminal
+
+`python main.py`
