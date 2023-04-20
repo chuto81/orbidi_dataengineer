@@ -2,7 +2,7 @@ import psycopg2
 from config import dict_database_config
 
 
-class BuildPostgreSQLDatabase():
+class BuildPostgreSQLDatabase:
     '''
     Esta clase crea una tabla separada cliente_proyecto para almacenar las relaciones
     entre clientes y proyectos basadas en 'linked_tasks'. Después de insertar clientes
@@ -27,7 +27,7 @@ class BuildPostgreSQLDatabase():
 
     def create_tables(self):
         cursor = self.connection.cursor()
-        cursor.execute("""
+        cursor.execute('''
         CREATE TABLE IF NOT EXISTS clientes (
             id SERIAL PRIMARY KEY,
             external_id VARCHAR(255) UNIQUE,
@@ -46,9 +46,9 @@ class BuildPostgreSQLDatabase():
             team_id VARCHAR(255),
             space_id VARCHAR(255)
         )
-        """)
+        ''')
 
-        cursor.execute("""
+        cursor.execute('''
         CREATE TABLE IF NOT EXISTS proyectos (
             id SERIAL PRIMARY KEY,
             external_id VARCHAR(255) UNIQUE,
@@ -67,9 +67,9 @@ class BuildPostgreSQLDatabase():
             team_id VARCHAR(255),
             space_id VARCHAR(255)
         )
-        """)
+        ''')
 
-        cursor.execute("""
+        cursor.execute('''
         CREATE TABLE IF NOT EXISTS cliente_proyecto (
             id SERIAL PRIMARY KEY,
             cliente_id INTEGER,
@@ -80,7 +80,7 @@ class BuildPostgreSQLDatabase():
             FOREIGN KEY (cliente_id) REFERENCES clientes(id),
             FOREIGN KEY (proyecto_id) REFERENCES proyectos(id)
         )
-        """)
+        ''')
 
         self.connection.commit()
         cursor.close()
@@ -89,13 +89,13 @@ class BuildPostgreSQLDatabase():
         cursor = self.connection.cursor()
 
         for cliente in self.clientes:
-            cursor.execute("""
+            cursor.execute('''
             INSERT INTO clientes (external_id, custom_id, name, text_content, 
             description, status_status, status_color, status_type, status_orderindex, 
             orderindex, date_created, date_updated, time_estimate, team_id, space_id)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (external_id) DO NOTHING
-            """, (cliente['id'], cliente['custom_id'], cliente['name'], cliente['text_content'], 
+            ''', (cliente['id'], cliente['custom_id'], cliente['name'], cliente['text_content'], 
                   cliente['description'], cliente['status']['status'], cliente['status']['color'], 
                   cliente['status']['type'], cliente['status']['orderindex'], cliente['orderindex'], 
                   cliente['date_created'], cliente['date_updated'], cliente['time_estimate'], 
@@ -104,13 +104,13 @@ class BuildPostgreSQLDatabase():
 
 
         for proyecto in self.proyectos:
-            cursor.execute("""
+            cursor.execute('''
             INSERT INTO proyectos (external_id, custom_id, name, text_content, description, 
             status_status, status_color, status_type, status_orderindex, orderindex, 
             date_created, date_updated, time_estimate, team_id, space_id)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (external_id) DO NOTHING
-            """, (proyecto['id'], proyecto['custom_id'], proyecto['name'], proyecto['text_content'], 
+            ''', (proyecto['id'], proyecto['custom_id'], proyecto['name'], proyecto['text_content'], 
                   proyecto['description'], proyecto['status']['status'], proyecto['status']['color'], 
                   proyecto['status']['type'], proyecto['status']['orderindex'], proyecto['orderindex'], 
                   proyecto['date_created'], proyecto['date_updated'], proyecto['time_estimate'], 
@@ -121,20 +121,20 @@ class BuildPostgreSQLDatabase():
         for cliente in self.clientes:
             for linked_task in cliente['linked_tasks']:
                 # Obteinig internal client ID and its project
-                cursor.execute("SELECT id FROM clientes WHERE external_id = %s", 
+                cursor.execute('SELECT id FROM clientes WHERE external_id = %s', 
                                (linked_task['task_id'],))
                 cliente_id = cursor.fetchone()[0]
-                cursor.execute("SELECT id FROM proyectos WHERE external_id = %s", 
+                cursor.execute('SELECT id FROM proyectos WHERE external_id = %s', 
                                (linked_task['link_id'],))
                 proyecto_id = cursor.fetchone()[0]
 
                 # Inserting the relationshio on cliente_proyecto table
-                cursor.execute("""
+                cursor.execute('''
                 INSERT INTO cliente_proyecto (cliente_id, proyecto_id, date_created, userid, 
                 workspace_id)
                 VALUES (%s, %s, %s, %s, %s)
                 ON CONFLICT DO NOTHING
-                """, (cliente_id, proyecto_id, linked_task['date_created'], linked_task['userid'], 
+                ''', (cliente_id, proyecto_id, linked_task['date_created'], linked_task['userid'], 
                       linked_task['workspace_id']))
                 self.connection.commit()
 

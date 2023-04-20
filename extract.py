@@ -1,7 +1,7 @@
 import requests
 from config import API_URL, API_KEY
 
-class ExtractFromAPI():
+class ExtractFromAPI:
     def __init__(self, key, list_id):
         self.key = key
         self.list_id = list_id

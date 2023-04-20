@@ -1,8 +1,11 @@
 from config import dict_list_id
 from extract import ExtractFromAPI
 from build_database import BuildPostgreSQLDatabase
+from transform import TransformProductNametoCode, TransformNumtoFloat
+from load import LoadEstimatedTime
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
 
     # Extract all four JSON's list from ClickUp API and storing on dict
     dict_entities = {}
@@ -18,15 +21,16 @@ if __name__ == "__main__":
     # Create the PostgreSQL database
     build_database = BuildPostgreSQLDatabase(clientes_list, proyectos_list)
     build_database.create_tables()
-    
+    build_database.insert_data()
 
-    
-    
-    
-    
-    # build_database.create_tables()
-    # insert_data(connection, clientes, productos)
+    # Transform the PostgreSQL database
+    transform_database1 = TransformProductNametoCode(proyectos_list)
+    transform_database1.add_column()
+    transform_database1.change_name_to_code()
 
+    transform_database2 = TransformNumtoFloat()
+    transform_database2()
 
+    load_sum_estimated_time = LoadEstimatedTime()
+    load_sum_estimated_time()
 
-    # print(connection)
